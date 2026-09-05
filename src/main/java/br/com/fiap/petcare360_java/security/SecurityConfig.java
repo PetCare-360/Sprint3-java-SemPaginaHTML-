@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import br.com.fiap.petcare360_java.model.AppUser;
 import br.com.fiap.petcare360_java.repository.AppUserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
@@ -21,21 +22,26 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/login", "/register", "/auth/register", "/auth/login", "/swagger-ui/**", "/v3/**").permitAll()
+						.requestMatchers("/", "/auth/register", "/auth/login", "/swagger-ui/**", "/swagger-ui.html", "/v3/**").permitAll()
 						.requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
 						.requestMatchers("/vet", "/vet/**").hasRole("VETERINARIO")
 						.requestMatchers("/tutor", "/tutor/**").hasRole("CLIENTE")
 						.requestMatchers("/pets/**", "/messages/**", "/appointments/**", "/recommendations/**").hasAnyRole("CLIENTE", "ADMIN", "VETERINARIO")
 						.requestMatchers("/api/iot/**").hasAnyRole("ADMIN", "VETERINARIO")
 						.anyRequest().authenticated())
-				.formLogin(form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/dashboard", true)
-						.permitAll())
+				.formLogin(form -> form.disable())
+				.httpBasic(basic -> basic.disable())
+				.exceptionHandling(exception -> exception
+						.authenticationEntryPoint((request, response, authException) ->
+								response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Não autenticado"))
+						.accessDeniedHandler((request, response, accessDeniedException) ->
+								response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado")))
 				.logout(logout -> logout
-						.logoutSuccessUrl("/login?logout")
-						.permitAll());
+						.logoutUrl("/auth/logout")
+						.logoutSuccessHandler((request, response, authentication) ->
+								response.setStatus(HttpServletResponse.SC_NO_CONTENT)));
 
 		return http.build();
 	}
