@@ -172,36 +172,6 @@ Ao receber uma leitura, o backend:
 | POST | `/auth/register` | Registra usuario |
 | POST | `/auth/login` | Realiza login |
 
-### Frontend
-
-| Metodo | Endpoint | Descricao |
-|---|---|---|
-| GET | `/login` | Tela de login |
-| GET | `/register` | Cadastro de tutor ou veterinario |
-| GET | `/dashboard` | Redireciona para a tela correta conforme o perfil |
-| GET | `/tutor` | Painel web do tutor |
-| GET | `/tutor/pets` | Pets do tutor |
-| GET | `/tutor/pets/{id}` | Detalhes completos do pet |
-| GET | `/tutor/pets/novo` | Cadastro de pet com coleira |
-| GET | `/tutor/veterinarios` | Vinculo com veterinario |
-| GET | `/tutor/mensagens` | Mensagens do tutor |
-| GET | `/tutor/consultas` | Consultas do tutor |
-| GET | `/tutor/recomendacoes` | Recomendacoes recebidas |
-| GET | `/vet` | Painel web do veterinario |
-| GET | `/vet/pets` | Pets vinculados ao veterinario |
-| GET | `/vet/pets/{id}` | Detalhes completos do pet vinculado |
-| GET | `/vet/mensagens` | Mensagens do veterinario |
-| GET | `/vet/consultas` | Consultas do veterinario |
-| GET | `/vet/recomendacoes` | Recomendacoes criadas pelo veterinario |
-| GET | `/admin` | Painel web do administrador |
-| GET | `/admin/usuarios` | Usuarios cadastrados |
-| GET | `/admin/pets` | Pets e tutores vinculados |
-| GET | `/admin/pets/{id}` | Detalhes completos de qualquer pet |
-| GET | `/admin/vinculos` | Vinculos entre pets e veterinarios |
-| GET | `/admin/mensagens` | Mensagens do sistema |
-| GET | `/admin/consultas` | Consultas do sistema |
-| GET | `/admin/recomendacoes` | Recomendacoes do sistema |
-
 ### Pets
 
 | Metodo | Endpoint | Descricao |
@@ -216,6 +186,13 @@ Ao receber uma leitura, o backend:
 | GET | `/pets/{id}/health-status` | Consulta status consolidado |
 | GET | `/pets/quick-alerts` | Lista pets em alerta ou critico |
 | GET | `/pets/{id}/activity-summary` | Resume atividade das ultimas 24h |
+
+### Veterinarios
+
+| Metodo | Endpoint | Descricao |
+|---|---|---|
+| GET | `/veterinarians` | Lista usuarios ativos com perfil de veterinario |
+| POST | `/veterinarians/link` | Vincula um veterinario ao pet do tutor autenticado |
 
 ### IoT
 
