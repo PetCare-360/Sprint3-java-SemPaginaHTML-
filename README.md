@@ -171,6 +171,8 @@ Ao receber uma leitura, o backend:
 |---|---|---|
 | POST | `/auth/register` | Registra usuario |
 | POST | `/auth/login` | Realiza login |
+| GET | `/auth/me` | Retorna o usuario autenticado pela sessao atual |
+| POST | `/auth/logout` | Encerra a sessao e invalida o cookie JSESSIONID |
 
 ### Pets
 
@@ -212,6 +214,7 @@ Ao receber uma leitura, o backend:
 | POST | `/messages` | Envia mensagem entre tutor e veterinario |
 | GET | `/appointments` | Lista consultas do usuario autenticado |
 | POST | `/appointments` | Solicita consulta para um pet |
+| PUT | `/appointments/{id}` | Edita pet, veterinario, data e motivo da consulta |
 | PUT | `/appointments/{id}/finish` | Veterinario ou admin finaliza consulta |
 | DELETE | `/appointments/{id}` | Veterinario ou admin remove consulta |
 | GET | `/recommendations` | Lista recomendacoes de cuidado |

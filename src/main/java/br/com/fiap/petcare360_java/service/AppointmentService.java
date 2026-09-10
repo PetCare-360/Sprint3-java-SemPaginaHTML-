@@ -72,6 +72,45 @@ public class AppointmentService {
 	}
 
 	@Transactional
+	public AppointmentResponse update(Long id, AppointmentRequest request) {
+		Appointment appointment = appointmentRepository.findById(id)
+				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+
+		if (AppointmentStatusEnum.DONE.equals(appointment.getStatus())
+				|| AppointmentStatusEnum.CANCELED.equals(appointment.getStatus())) {
+			throw new ApiException(HttpStatus.CONFLICT, "Consultas concluídas ou canceladas não podem ser editadas");
+		}
+
+		Pet pet = clinicalAccessService.accessiblePet(request.petId());
+		AppUser veterinarian = clinicalAccessService.userById(request.veterinarianId());
+		boolean isVet = veterinarian.getRoles().stream()
+				.anyMatch(role -> "ROLE_VETERINARIO".equals(role.getName()));
+		if (!isVet) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "Usuário selecionado não possui perfil de veterinário");
+		}
+
+		if (!currentUserService.hasRole("ROLE_ADMIN")) {
+			AppUser currentUser = currentUserService.user();
+			if (!currentUserService.hasRole("ROLE_CLIENTE") || !appointment.getTutor().getId().equals(currentUser.getId())
+					|| !pet.getUser().getId().equals(currentUser.getId())) {
+				throw new ApiException(HttpStatus.FORBIDDEN, "Apenas o tutor da consulta pode editar este agendamento");
+			}
+		}
+
+		if (!petVeterinarianRepository.existsActiveLink(pet.getId(), veterinarian.getEmail())) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "O veterinário não está vinculado a este pet");
+		}
+
+		appointment.setPet(pet);
+		appointment.setTutor(pet.getUser());
+		appointment.setVeterinarian(veterinarian);
+		appointment.setScheduledAt(request.scheduledAt());
+		appointment.setReason(request.reason().trim());
+
+		return toResponse(appointmentRepository.save(appointment));
+	}
+
+	@Transactional
 	public AppointmentResponse finish(Long id) {
 		Appointment appointment = findManageableAppointment(id);
 		appointment.setStatus(AppointmentStatusEnum.DONE);

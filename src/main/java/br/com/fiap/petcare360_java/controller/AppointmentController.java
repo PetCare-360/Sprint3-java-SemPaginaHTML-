@@ -38,6 +38,11 @@ public class AppointmentController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.request(request));
 	}
 
+	@PutMapping("/{id}")
+	public AppointmentResponse update(@PathVariable Long id, @RequestBody @Valid AppointmentRequest request) {
+		return appointmentService.update(id, request);
+	}
+
 	@PutMapping("/{id}/finish")
 	public AppointmentResponse finish(@PathVariable Long id) {
 		return appointmentService.finish(id);

@@ -44,11 +44,7 @@ public class SecurityConfig {
 						.authenticationEntryPoint((request, response, authException) ->
 								response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Não autenticado"))
 						.accessDeniedHandler((request, response, accessDeniedException) ->
-								response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado")))
-				.logout(logout -> logout
-						.logoutUrl("/auth/logout")
-						.logoutSuccessHandler((request, response, authentication) ->
-								response.setStatus(HttpServletResponse.SC_NO_CONTENT)));
+								response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso negado")));
 
 		return http.build();
 	}

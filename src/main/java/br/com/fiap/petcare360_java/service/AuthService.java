@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.fiap.petcare360_java.dto.AuthRequest;
 import br.com.fiap.petcare360_java.dto.AuthResponse;
 import br.com.fiap.petcare360_java.dto.RegisterRequest;
+import br.com.fiap.petcare360_java.dto.UserResponse;
 import br.com.fiap.petcare360_java.exception.ApiException;
 import br.com.fiap.petcare360_java.model.AppUser;
 import br.com.fiap.petcare360_java.repository.AppUserRepository;
@@ -86,5 +87,17 @@ public class AuthService {
 				.orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas"));
 
 		return new AuthResponse("Login realizado com sucesso", mapper.toUserResponse(user));
+	}
+
+	@Transactional(readOnly = true)
+	public UserResponse me() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()
+				|| "anonymousUser".equals(authentication.getName())) {
+			throw new ApiException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+		}
+
+		return mapper.toUserResponse(userRepository.findByEmail(authentication.getName())
+				.orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado")));
 	}
 }
