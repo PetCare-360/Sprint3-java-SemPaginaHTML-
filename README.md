@@ -83,6 +83,86 @@ As credenciais abaixo sao criadas pela carga inicial do banco:
 | Tutor | `tutor@petcare360.com` | `senha1234` |
 | Veterinario | `veterinario@petcare360.com` | `senha1234` |
 
+## Deploy e testes
+
+### 1. Clonar os repositórios
+
+```bash
+git clone https://github.com/PetCare-360/Sprint3-java-SemPaginaHTML-.git
+git clone https://github.com/LuisGdev13/petcare360_DB.git
+```
+
+> Antes do build do banco, verifique se o `run-sql.sh` está utilizando **LF** como final de linha.
+
+### 2. Criar os recursos Azure
+
+Na pasta dos scripts:
+
+```bash
+chmod +x 01-variaveis.sh
+chmod +x 02-criar-acr.sh
+chmod +x 04-criar-storage.sh
+chmod +x 05-criar-aci-banco.sh
+chmod +x 06-criar-aci-api.sh
+
+az login
+
+./02-criar-acr.sh
+./04-criar-storage.sh
+```
+
+### 3. Build e Push das imagens
+
+Autentique no ACR:
+
+```bash
+az acr login --name acrpetcare
+```
+
+Na pasta da API:
+
+```bash
+docker build -t petcare-api:v1 .
+docker tag petcare-api:v1 acrpetcare.azurecr.io/petcare-api:v1
+docker push acrpetcare.azurecr.io/petcare-api:v1
+```
+
+Na pasta do banco:
+
+```bash
+docker build -t petcare-db:v1 .
+docker tag petcare-db:v1 acrpetcare.azurecr.io/petcare-db:v1
+docker push acrpetcare.azurecr.io/petcare-db:v1
+```
+
+### 4. Criar os containers
+
+```bash
+./05-criar-aci-banco.sh
+./06-criar-aci-api.sh
+```
+
+### 5. Testar a API
+
+Acesse o Swagger:
+
+```text
+http://petcare-aci-api.canadacentral.azurecontainer.io:8080/swagger-ui/index.html
+```
+
+Faça login pelo endpoint:
+
+```text
+POST /auth/login
+```
+
+Após obter o token JWT, utilize-o para testar o CRUD das tabelas:
+
+- `SJ_PETS`
+- `SJ_SENSOR_DATA`
+
+Os testes contemplam operações de **POST, GET, PUT e DELETE**.
+
 ## Arquitetura
 
 O projeto segue arquitetura em camadas:
